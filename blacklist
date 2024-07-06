@@ -1,0 +1,6 @@
+if game.Players.LocalPlayer.UserId == 2800534563
+then 
+    game.Players.LocalPlayer:Kick("gay")
+else
+print("no")
+end
