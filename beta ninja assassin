@@ -2,7 +2,7 @@
 
 loadstring(game:HttpGet(('https://raw.githubusercontent.com/JXJmasterbringer/beta/main/blacklist'),true))()
 wait(5)
-loadstring(game:HttpGet("https://raw.githubusercontent.com/JXJmasterbringer/pago/main/betahook",true))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/JXJmasterbringer/beta/main/betahook",true))()
 wait()
 local NinjaGui = Instance.new("ScreenGui")
 local main = Instance.new("Frame")
