@@ -1,4 +1,4 @@
-if game.Players.LocalPlayer.UserId == 4158177425
+if game.Players.LocalPlayer.UserId == 2800534563
 then 
     game.Players.LocalPlayer:Kick("User Blacklisted")
 else
