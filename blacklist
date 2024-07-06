@@ -19,3 +19,9 @@ else
 print("no")
 end
 
+if game.Players.LocalPlayer.UserId == 2806861475
+then 
+    game.Players.LocalPlayer:Kick("User Blacklisted. dm any admin to get unblacklisted")
+else
+print("no")
+end
