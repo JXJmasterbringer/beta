@@ -12,7 +12,7 @@ else
 print("no")
 end
 
-if game.Players.LocalPlayer.UserId == 4158177425
+if game.Players.LocalPlayer.UserId == 481171772 
 then 
     game.Players.LocalPlayer:Kick("User Blacklisted. dm any admin to get unblacklisted")
 else
