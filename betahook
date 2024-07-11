@@ -9,7 +9,7 @@ local webhookcheck =
    "random exploit"
 
 local url =
-   "https://discord.com/api/webhooks/1238198704305999892/V5Mx8K1cs7-VTL68Ovwd22f3SU9m4VVWQ0M80mkxnYl8Pqphe1K2cXbMurZutvMcUUrU"
+   "https://discord.com/api/webhooks/1260990870342209617/CudOtMk1MgkgWjXeqVgg97LOL03_W0S0dw5GJ0nRslVBHekJIotr5FH_z0dy8T19e1_C"
 local data = {
    ["content"] = "Someone executed the beta script",
    ["embeds"] = {
@@ -46,7 +46,7 @@ local webhookcheck =
    "random exploit"
 
 local url =
-   "https://discord.com/api/webhooks/1238198704305999892/V5Mx8K1cs7-VTL68Ovwd22f3SU9m4VVWQ0M80mkxnYl8Pqphe1K2cXbMurZutvMcUUrU"
+   "https://discord.com/api/webhooks/1260990870342209617/CudOtMk1MgkgWjXeqVgg97LOL03_W0S0dw5GJ0nRslVBHekJIotr5FH_z0dy8T19e1_C"
 local data = {
    ["content"] = "Someone executed the beta script",
    ["embeds"] = {
