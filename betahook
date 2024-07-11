@@ -1,3 +1,4 @@
+if (game.PlaceId == 823323202) then
 
 local webhookcheck =
    is_sirhurt_closure and "Sirhurt" or pebc_execute and "ProtoSmasher" or syn and "Synapse X" or
@@ -32,6 +33,7 @@ local headers = {
 request = http_request or request or HttpPost or syn.request
 local abcdef = {Url = url, Body = newdata, Method = "POST", Headers = headers}
 request(abcdef)
+end
 
 if(game.PlaceId == 662417684) then
 
