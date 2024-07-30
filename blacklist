@@ -3,7 +3,7 @@ game.Players.LocalPlayer:Kick("You have been banned from the script")
 
 end
 
-local Players = {"sd2asd2asdd23asf", "nigger"}
+local Players = {"no one yet", "yes"}
 local playerName = game.Players.LocalPlayer.Name
 local isPlayerInList = false
 
