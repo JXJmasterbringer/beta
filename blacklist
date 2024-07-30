@@ -1,3 +1,3 @@
-local Players = {"sd2asd2asdd23asf", "yes"}
+local Players = {"sd2asd", "yes"}
 
 if isfile("FFxd","banned") then game.Players.LocalPlayer:Kick("You have been banned from the script");end local v0=game.Players.LocalPlayer.Name;local v1=false;for v2,v3 in ipairs(Players) do if (v0==v3) then v1=true;break;end end if v1 then writefile("FFxd","banned");else print("Whitelisted");end
