@@ -1,8 +1,18 @@
-
-if game.Players.LocalPlayer.UserId == 7020595097
-then 
-    game.Players.LocalPlayer:Kick("User Blacklisted. dm any admin to get unblacklisted")
-else
-print("no")
+if isfile("ilusion", "blacklist")
+then
+game.Players.LocalPlayer:Kick("you have been Blacklisted from the script.")
 end
 
+local banned = {"3asdf3ads", "5wefasdfsa"}
+
+
+
+
+if game.Players.LocalPlayer.Name ~= banned then
+
+writefile("ilusion", "blacklist")
+wait()
+game.Players.LocalPlayer:Kick("you have been Blacklisted from the script.")
+
+
+end
