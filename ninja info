@@ -1,0 +1,90 @@
+-- Gui to Lua
+-- Version: 3.2
+
+-- Instances:
+
+local info = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local info1 = Instance.new("TextLabel")
+local TextLabel = Instance.new("TextLabel")
+local info1name = Instance.new("TextLabel")
+local info2 = Instance.new("TextLabel")
+local info2name = Instance.new("TextLabel")
+
+Frame.Draggable = true
+
+Frame.Active = true
+
+info.Name = "info"
+info.Parent = game.CoreGui
+
+Frame.Parent = info
+Frame.BackgroundColor3 = Color3.fromRGB(114, 17, 147)
+Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0, 0, 0.347014934, 0)
+Frame.Size = UDim2.new(0, 199, 0, 25)
+
+info1.Name = "info 1"
+info1.Parent = Frame
+info1.BackgroundColor3 = Color3.fromRGB(114, 17, 147)
+info1.BorderColor3 = Color3.fromRGB(0, 0, 0)
+info1.BorderSizePixel = 0
+info1.Position = UDim2.new(0.336683422, 0, 1.00000238, 0)
+info1.Size = UDim2.new(0, 132, 0, 23)
+info1.Font = Enum.Font.SourceSans
+info1.Text = "info1"
+info1.TextColor3 = Color3.fromRGB(0, 0, 0)
+info1.TextSize = 14.000
+
+TextLabel.Parent = Frame
+TextLabel.BackgroundColor3 = Color3.fromRGB(114, 17, 147)
+TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel.BorderSizePixel = 0
+TextLabel.Position = UDim2.new(0, 0, 0.3125, 0)
+TextLabel.Size = UDim2.new(0, 199, 0, 15)
+TextLabel.Font = Enum.Font.SourceSans
+TextLabel.Text = "Info Panel"
+TextLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel.TextSize = 14.000
+
+info1name.Name = "info1 name"
+info1name.Parent = Frame
+info1name.BackgroundColor3 = Color3.fromRGB(114, 17, 147)
+info1name.BorderColor3 = Color3.fromRGB(0, 0, 0)
+info1name.BorderSizePixel = 0
+info1name.Position = UDim2.new(0, 0, 0.880002439, 0)
+info1name.Size = UDim2.new(0, 87, 0, 26)
+info1name.Font = Enum.Font.SourceSans
+info1name.Text = "Ninjutsu:"
+info1name.TextColor3 = Color3.fromRGB(0, 0, 0)
+info1name.TextSize = 14.000
+
+info2.Name = "info 2"
+info2.Parent = Frame
+info2.BackgroundColor3 = Color3.fromRGB(114, 17, 147)
+info2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+info2.BorderSizePixel = 0
+info2.Position = UDim2.new(0.336683422, 0, 1.92000246, 0)
+info2.Size = UDim2.new(0, 132, 0, 23)
+info2.Font = Enum.Font.SourceSans
+info2.Text = "info1"
+info2.TextColor3 = Color3.fromRGB(0, 0, 0)
+info2.TextSize = 14.000
+
+info2name.Name = "info2 name"
+info2name.Parent = Frame
+info2name.BackgroundColor3 = Color3.fromRGB(114, 17, 147)
+info2name.BorderColor3 = Color3.fromRGB(0, 0, 0)
+info2name.BorderSizePixel = 0
+info2name.Position = UDim2.new(0, 0, 1.80000246, 0)
+info2name.Size = UDim2.new(0, 87, 0, 26)
+info2name.Font = Enum.Font.SourceSans
+info2name.Text = "Reputation:"
+info2name.TextColor3 = Color3.fromRGB(0, 0, 0)
+info2name.TextSize = 14.000
+while wait() do 
+	info1.Text = game.Players.LocalPlayer.leaderstats.Ninjutsu.value
+	info2.Text = game.Players.LocalPlayer.leaderstats.Reputation.value
+
+end
