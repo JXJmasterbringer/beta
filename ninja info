@@ -44,7 +44,7 @@ info1name.BorderSizePixel = 0
 info1name.Position = UDim2.new(-0.145624548, 0, 0.164208978, 0)
 info1name.Size = UDim2.new(0, 87, 0, 21)
 info1name.Font = Enum.Font.SourceSans
-info1name.Text = "info1:"
+info1name.Text = "ninjutsu/Health:"
 info1name.TextColor3 = Color3.fromRGB(227, 44, 193)
 info1name.TextSize = 14.000
 
@@ -57,7 +57,7 @@ info2name.BorderSizePixel = 0
 info2name.Position = UDim2.new(-0.146453783, 0, 0.353611708, 0)
 info2name.Size = UDim2.new(0, 87, 0, 16)
 info2name.Font = Enum.Font.SourceSans
-info2name.Text = "info2:"
+info2name.Text = "Reputation:"
 info2name.TextColor3 = Color3.fromRGB(227, 44, 193)
 info2name.TextSize = 14.000
 
