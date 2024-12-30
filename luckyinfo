@@ -1,1 +1,106 @@
 
+
+local infolucky = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local TextLabel = Instance.new("TextLabel")
+local info1name = Instance.new("TextLabel")
+local info2name = Instance.new("TextLabel")
+local line = Instance.new("TextLabel")
+local info1 = Instance.new("TextLabel")
+local info2 = Instance.new("TextLabel")
+
+--Properties:
+
+infolucky.Name = "infolucky"
+infolucky.Parent = game.CoreGui
+
+Frame.Parent = infolucky
+Frame.Active = true
+Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.0209299941, 0, 0.424129367, 0)
+Frame.Size = UDim2.new(0, 199, 0, 135)
+Frame.Style = Enum.FrameStyle.RobloxRound
+Frame.Draggable = true
+
+TextLabel.Parent = Frame
+TextLabel.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+TextLabel.BackgroundTransparency = 1.000
+TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel.BorderSizePixel = 0
+TextLabel.Position = UDim2.new(-0.0109956823, 0, -0.00577347353, 0)
+TextLabel.Size = UDim2.new(0, 199, 0, 15)
+TextLabel.Font = Enum.Font.SourceSans
+TextLabel.Text = "Info Panel"
+TextLabel.TextColor3 = Color3.fromRGB(227, 44, 193)
+TextLabel.TextSize = 14.000
+
+info1name.Name = "info1 name"
+info1name.Parent = Frame
+info1name.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+info1name.BackgroundTransparency = 1.000
+info1name.BorderColor3 = Color3.fromRGB(0, 0, 0)
+info1name.BorderSizePixel = 0
+info1name.Position = UDim2.new(-0.184839293, 0, 0.158483654, 0)
+info1name.Size = UDim2.new(0, 87, 0, 21)
+info1name.Font = Enum.Font.SourceSans
+info1name.Text = "Spawn"
+info1name.TextColor3 = Color3.fromRGB(227, 44, 193)
+info1name.TextSize = 14.000
+
+info2name.Name = "info2 name"
+info2name.Parent = Frame
+info2name.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+info2name.BackgroundTransparency = 1.000
+info2name.BorderColor3 = Color3.fromRGB(0, 0, 0)
+info2name.BorderSizePixel = 0
+info2name.Position = UDim2.new(-0.109300546, 0, 0.358764201, 0)
+info2name.Size = UDim2.new(0, 86, 0, 16)
+info2name.Font = Enum.Font.SourceSans
+info2name.Text = "TimePlayed"
+info2name.TextColor3 = Color3.fromRGB(227, 44, 193)
+info2name.TextSize = 14.000
+
+line.Name = "line"
+line.Parent = Frame
+line.BackgroundColor3 = Color3.fromRGB(227, 44, 193)
+line.BorderColor3 = Color3.fromRGB(0, 0, 0)
+line.BorderSizePixel = 0
+line.Position = UDim2.new(-0.0462148078, 0, 0.36441198, 0)
+line.Size = UDim2.new(0, 198, 0, -2)
+line.Font = Enum.Font.SourceSans
+line.Text = ""
+line.TextColor3 = Color3.fromRGB(0, 0, 0)
+line.TextSize = 14.000
+
+info1.Name = "info1"
+info1.Parent = Frame
+info1.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+info1.BackgroundTransparency = 1.000
+info1.BorderColor3 = Color3.fromRGB(0, 0, 0)
+info1.BorderSizePixel = 0
+info1.Position = UDim2.new(0.311385274, 0, 0.159304693, 0)
+info1.Size = UDim2.new(0, 87, 0, 21)
+info1.Font = Enum.Font.SourceSans
+info1.Text = "info1"
+info1.TextColor3 = Color3.fromRGB(227, 44, 193)
+info1.TextSize = 14.000
+
+info2.Name = "info2 "
+info2.Parent = Frame
+info2.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+info2.BackgroundTransparency = 1.000
+info2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+info2.BorderSizePixel = 0
+info2.Position = UDim2.new(0.309342057, 0, 0.35926649, 0)
+info2.Size = UDim2.new(0, 87, 0, 16)
+info2.Font = Enum.Font.SourceSans
+info2.Text = "info2"
+info2.TextColor3 = Color3.fromRGB(227, 44, 193)
+info2.TextSize = 14.000
+while wait() do 
+	info1.Text = game.Players.LocalPlayer.Spawn.value
+	info2.Text = game.Players.LocalPlayer.leaderstats.Minutes.value
+
+end
