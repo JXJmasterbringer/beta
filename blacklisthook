@@ -1,33 +1,460 @@
-local webhookcheck =
-   is_sirhurt_closure and "Sirhurt" or pebc_execute and "ProtoSmasher" or syn and "Synapse X" or
-   secure_load and "Sentinel" or
-   KRNL_LOADED and "Krnl" or
-   SONA_LOADED and "Sona" or
-   ScriptWare_LOADED and "ScriptWare" or
-   "random exploit"
+--[[
+ .____                  ________ ___.    _____                           __                
+ |    |    __ _______   \_____  \\_ |___/ ____\_ __  ______ ____ _____ _/  |_  ___________ 
+ |    |   |  |  \__  \   /   |   \| __ \   __\  |  \/  ___// ___\\__  \\   __\/  _ \_  __ \
+ |    |___|  |  // __ \_/    |    \ \_\ \  | |  |  /\___ \\  \___ / __ \|  | (  <_> )  | \/
+ |_______ \____/(____  /\_______  /___  /__| |____//____  >\___  >____  /__|  \____/|__|   
+         \/          \/         \/    \/                \/     \/     \/                   
+          \_Welcome to LuaObfuscator.com   (Alpha 0.10.8) ~  Much Love, Ferib 
 
-local url =
-   "https://discord.com/api/webhooks/1326000870512660553/T0eSatf1Kg9HOvq3TtFJr88CCmqBhXwJiTGfngn7vVa_0QqEYivCNEkFQ1NMhdXvh8Is"
-local data = {
-   ["content"] = "Someone was BLACKLISTED @everyone",
-   ["embeds"] = {
-       {
-           ["title"] = "**Beta version**",
-           ["description"] = "Username: " .. game.Players.LocalPlayer.Name.." with **"..webhookcheck.."**",
-           ["type"] = "rich",
-           ["color"] = tonumber(0x7269da),
-           ["image"] = {
-               ["url"] = "http://www.roblox.com/Thumbs/Avatar.ashx?x=150&y=150&Format=Png&username=" ..
-                   tostring(game:GetService("Players").LocalPlayer.Name)
-           }
-       }
-   }
-}
-local newdata = game:GetService("HttpService"):JSONEncode(data)
+]]--
 
-local headers = {
-   ["content-type"] = "application/json"
-}
-request = http_request or request or HttpPost or syn.request
-local abcdef = {Url = url, Body = newdata, Method = "POST", Headers = headers}
-request(abcdef)
+local StrToNumber = tonumber;
+local Byte = string.byte;
+local Char = string.char;
+local Sub = string.sub;
+local Subg = string.gsub;
+local Rep = string.rep;
+local Concat = table.concat;
+local Insert = table.insert;
+local LDExp = math.ldexp;
+local GetFEnv = getfenv or function()
+	return _ENV;
+end;
+local Setmetatable = setmetatable;
+local PCall = pcall;
+local Select = select;
+local Unpack = unpack or table.unpack;
+local ToNumber = tonumber;
+local function VMCall(ByteString, vmenv, ...)
+	local DIP = 1;
+	local repeatNext;
+	ByteString = Subg(Sub(ByteString, 5), "..", function(byte)
+		if (Byte(byte, 2) == 81) then
+			repeatNext = StrToNumber(Sub(byte, 1, 1));
+			return "";
+		else
+			local a = Char(StrToNumber(byte, 16));
+			if repeatNext then
+				local b = Rep(a, repeatNext);
+				repeatNext = nil;
+				return b;
+			else
+				return a;
+			end
+		end
+	end);
+	local function gBit(Bit, Start, End)
+		if End then
+			local Res = (Bit / (2 ^ (Start - 1))) % (2 ^ (((End - 1) - (Start - 1)) + 1));
+			return Res - (Res % 1);
+		else
+			local Plc = 2 ^ (Start - 1);
+			return (((Bit % (Plc + Plc)) >= Plc) and 1) or 0;
+		end
+	end
+	local function gBits8()
+		local a = Byte(ByteString, DIP, DIP);
+		DIP = DIP + 1;
+		return a;
+	end
+	local function gBits16()
+		local a, b = Byte(ByteString, DIP, DIP + 2);
+		DIP = DIP + 2;
+		return (b * 256) + a;
+	end
+	local function gBits32()
+		local a, b, c, d = Byte(ByteString, DIP, DIP + 3);
+		DIP = DIP + 4;
+		return (d * 16777216) + (c * 65536) + (b * 256) + a;
+	end
+	local function gFloat()
+		local Left = gBits32();
+		local Right = gBits32();
+		local IsNormal = 1;
+		local Mantissa = (gBit(Right, 1, 20) * (2 ^ 32)) + Left;
+		local Exponent = gBit(Right, 21, 31);
+		local Sign = ((gBit(Right, 32) == 1) and -1) or 1;
+		if (Exponent == 0) then
+			if (Mantissa == 0) then
+				return Sign * 0;
+			else
+				Exponent = 1;
+				IsNormal = 0;
+			end
+		elseif (Exponent == 2047) then
+			return ((Mantissa == 0) and (Sign * (1 / 0))) or (Sign * NaN);
+		end
+		return LDExp(Sign, Exponent - 1023) * (IsNormal + (Mantissa / (2 ^ 52)));
+	end
+	local function gString(Len)
+		local Str;
+		if not Len then
+			Len = gBits32();
+			if (Len == 0) then
+				return "";
+			end
+		end
+		Str = Sub(ByteString, DIP, (DIP + Len) - 1);
+		DIP = DIP + Len;
+		local FStr = {};
+		for Idx = 1, #Str do
+			FStr[Idx] = Char(Byte(Sub(Str, Idx, Idx)));
+		end
+		return Concat(FStr);
+	end
+	local gInt = gBits32;
+	local function _R(...)
+		return {...}, Select("#", ...);
+	end
+	local function Deserialize()
+		local Instrs = {};
+		local Functions = {};
+		local Lines = {};
+		local Chunk = {Instrs,Functions,nil,Lines};
+		local ConstCount = gBits32();
+		local Consts = {};
+		for Idx = 1, ConstCount do
+			local Type = gBits8();
+			local Cons;
+			if (Type == 1) then
+				Cons = gBits8() ~= 0;
+			elseif (Type == 2) then
+				Cons = gFloat();
+			elseif (Type == 3) then
+				Cons = gString();
+			end
+			Consts[Idx] = Cons;
+		end
+		Chunk[3] = gBits8();
+		for Idx = 1, gBits32() do
+			local Descriptor = gBits8();
+			if (gBit(Descriptor, 1, 1) == 0) then
+				local Type = gBit(Descriptor, 2, 3);
+				local Mask = gBit(Descriptor, 4, 6);
+				local Inst = {gBits16(),gBits16(),nil,nil};
+				if (Type == 0) then
+					Inst[3] = gBits16();
+					Inst[4] = gBits16();
+				elseif (Type == 1) then
+					Inst[3] = gBits32();
+				elseif (Type == 2) then
+					Inst[3] = gBits32() - (2 ^ 16);
+				elseif (Type == 3) then
+					Inst[3] = gBits32() - (2 ^ 16);
+					Inst[4] = gBits16();
+				end
+				if (gBit(Mask, 1, 1) == 1) then
+					Inst[2] = Consts[Inst[2]];
+				end
+				if (gBit(Mask, 2, 2) == 1) then
+					Inst[3] = Consts[Inst[3]];
+				end
+				if (gBit(Mask, 3, 3) == 1) then
+					Inst[4] = Consts[Inst[4]];
+				end
+				Instrs[Idx] = Inst;
+			end
+		end
+		for Idx = 1, gBits32() do
+			Functions[Idx - 1] = Deserialize();
+		end
+		return Chunk;
+	end
+	local function Wrap(Chunk, Upvalues, Env)
+		local Instr = Chunk[1];
+		local Proto = Chunk[2];
+		local Params = Chunk[3];
+		return function(...)
+			local Instr = Instr;
+			local Proto = Proto;
+			local Params = Params;
+			local _R = _R;
+			local VIP = 1;
+			local Top = -1;
+			local Vararg = {};
+			local Args = {...};
+			local PCount = Select("#", ...) - 1;
+			local Lupvals = {};
+			local Stk = {};
+			for Idx = 0, PCount do
+				if (Idx >= Params) then
+					Vararg[Idx - Params] = Args[Idx + 1];
+				else
+					Stk[Idx] = Args[Idx + 1];
+				end
+			end
+			local Varargsz = (PCount - Params) + 1;
+			local Inst;
+			local Enum;
+			while true do
+				Inst = Instr[VIP];
+				Enum = Inst[1];
+				if (Enum <= 11) then
+					if (Enum <= 5) then
+						if (Enum <= 2) then
+							if (Enum <= 0) then
+								local A = Inst[2];
+								local B = Stk[Inst[3]];
+								Stk[A + 1] = B;
+								Stk[A] = B[Inst[4]];
+							elseif (Enum == 1) then
+								local A = Inst[2];
+								Stk[A](Stk[A + 1]);
+							else
+								local A = Inst[2];
+								Stk[A] = Stk[A](Unpack(Stk, A + 1, Inst[3]));
+							end
+						elseif (Enum <= 3) then
+							Stk[Inst[2]] = Env[Inst[3]];
+						elseif (Enum == 4) then
+							do
+								return;
+							end
+						else
+							local A = Inst[2];
+							local T = Stk[A];
+							local B = Inst[3];
+							for Idx = 1, B do
+								T[Idx] = Stk[A + Idx];
+							end
+						end
+					elseif (Enum <= 8) then
+						if (Enum <= 6) then
+							VIP = Inst[3];
+						elseif (Enum == 7) then
+							if not Stk[Inst[2]] then
+								VIP = VIP + 1;
+							else
+								VIP = Inst[3];
+							end
+						else
+							Stk[Inst[2]][Inst[3]] = Stk[Inst[4]];
+						end
+					elseif (Enum <= 9) then
+						local A = Inst[2];
+						Stk[A] = Stk[A](Stk[A + 1]);
+					elseif (Enum == 10) then
+						local A;
+						local K;
+						local B;
+						Stk[Inst[2]] = Stk[Inst[3]];
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]] = Inst[3];
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						B = Inst[3];
+						K = Stk[B];
+						for Idx = B + 1, Inst[4] do
+							K = K .. Stk[Idx];
+						end
+						Stk[Inst[2]] = K;
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]][Inst[3]] = Stk[Inst[4]];
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]][Inst[3]] = Inst[4];
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]] = Env[Inst[3]];
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]] = Inst[3];
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						A = Inst[2];
+						Stk[A] = Stk[A](Stk[A + 1]);
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]][Inst[3]] = Stk[Inst[4]];
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]] = {};
+					else
+						Stk[Inst[2]] = {};
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]][Inst[3]] = Inst[4];
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]] = {};
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]] = {};
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]][Inst[3]] = Inst[4];
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]] = Inst[3];
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]] = Env[Inst[3]];
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]] = Stk[Inst[3]][Inst[4]];
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]] = Stk[Inst[3]][Inst[4]];
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]] = Stk[Inst[3]][Inst[4]];
+					end
+				elseif (Enum <= 17) then
+					if (Enum <= 14) then
+						if (Enum <= 12) then
+							Stk[Inst[2]] = Stk[Inst[3]];
+						elseif (Enum > 13) then
+							Stk[Inst[2]][Inst[3]] = Inst[4];
+						else
+							local B;
+							local A;
+							Stk[Inst[2]] = Env[Inst[3]];
+							VIP = VIP + 1;
+							Inst = Instr[VIP];
+							A = Inst[2];
+							B = Stk[Inst[3]];
+							Stk[A + 1] = B;
+							Stk[A] = B[Inst[4]];
+							VIP = VIP + 1;
+							Inst = Instr[VIP];
+							Stk[Inst[2]] = Inst[3];
+							VIP = VIP + 1;
+							Inst = Instr[VIP];
+							A = Inst[2];
+							Stk[A] = Stk[A](Unpack(Stk, A + 1, Inst[3]));
+							VIP = VIP + 1;
+							Inst = Instr[VIP];
+							A = Inst[2];
+							B = Stk[Inst[3]];
+							Stk[A + 1] = B;
+							Stk[A] = B[Inst[4]];
+							VIP = VIP + 1;
+							Inst = Instr[VIP];
+							Stk[Inst[2]] = Stk[Inst[3]];
+							VIP = VIP + 1;
+							Inst = Instr[VIP];
+							A = Inst[2];
+							Stk[A] = Stk[A](Unpack(Stk, A + 1, Inst[3]));
+							VIP = VIP + 1;
+							Inst = Instr[VIP];
+							Stk[Inst[2]] = {};
+							VIP = VIP + 1;
+							Inst = Instr[VIP];
+							Stk[Inst[2]][Inst[3]] = Inst[4];
+							VIP = VIP + 1;
+							Inst = Instr[VIP];
+							Stk[Inst[2]] = Env[Inst[3]];
+						end
+					elseif (Enum <= 15) then
+						local B = Inst[3];
+						local K = Stk[B];
+						for Idx = B + 1, Inst[4] do
+							K = K .. Stk[Idx];
+						end
+						Stk[Inst[2]] = K;
+					elseif (Enum > 16) then
+						if Stk[Inst[2]] then
+							VIP = VIP + 1;
+						else
+							VIP = Inst[3];
+						end
+					else
+						Env[Inst[3]] = Stk[Inst[2]];
+					end
+				elseif (Enum <= 20) then
+					if (Enum <= 18) then
+						local A;
+						Stk[Inst[2]] = {};
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]][Inst[3]] = Stk[Inst[4]];
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]][Inst[3]] = Stk[Inst[4]];
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]][Inst[3]] = Inst[4];
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]][Inst[3]] = Stk[Inst[4]];
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]] = Env[Inst[3]];
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						Stk[Inst[2]] = Stk[Inst[3]];
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						A = Inst[2];
+						Stk[A](Stk[A + 1]);
+						VIP = VIP + 1;
+						Inst = Instr[VIP];
+						do
+							return;
+						end
+					elseif (Enum == 19) then
+						Stk[Inst[2]] = Stk[Inst[3]][Inst[4]];
+					else
+						local A = Inst[2];
+						local T = Stk[A];
+						for Idx = A + 1, Inst[3] do
+							Insert(T, Stk[Idx]);
+						end
+					end
+				elseif (Enum <= 21) then
+					local K;
+					local B;
+					local A;
+					Stk[Inst[2]] = Env[Inst[3]];
+					VIP = VIP + 1;
+					Inst = Instr[VIP];
+					Stk[Inst[2]] = Env[Inst[3]];
+					VIP = VIP + 1;
+					Inst = Instr[VIP];
+					A = Inst[2];
+					B = Stk[Inst[3]];
+					Stk[A + 1] = B;
+					Stk[A] = B[Inst[4]];
+					VIP = VIP + 1;
+					Inst = Instr[VIP];
+					Stk[Inst[2]] = Inst[3];
+					VIP = VIP + 1;
+					Inst = Instr[VIP];
+					A = Inst[2];
+					Stk[A] = Stk[A](Unpack(Stk, A + 1, Inst[3]));
+					VIP = VIP + 1;
+					Inst = Instr[VIP];
+					Stk[Inst[2]] = Stk[Inst[3]][Inst[4]];
+					VIP = VIP + 1;
+					Inst = Instr[VIP];
+					Stk[Inst[2]] = Stk[Inst[3]][Inst[4]];
+					VIP = VIP + 1;
+					Inst = Instr[VIP];
+					A = Inst[2];
+					Stk[A] = Stk[A](Stk[A + 1]);
+					VIP = VIP + 1;
+					Inst = Instr[VIP];
+					B = Inst[3];
+					K = Stk[B];
+					for Idx = B + 1, Inst[4] do
+						K = K .. Stk[Idx];
+					end
+					Stk[Inst[2]] = K;
+					VIP = VIP + 1;
+					Inst = Instr[VIP];
+					Stk[Inst[2]][Inst[3]] = Stk[Inst[4]];
+				elseif (Enum > 22) then
+					Stk[Inst[2]] = Inst[3];
+				else
+					Stk[Inst[2]] = {};
+				end
+				VIP = VIP + 1;
+			end
+		end;
+	end
+	return Wrap(Deserialize(), {}, vmenv)(...);
+end
+return VMCall("LOL!333Q0003123Q0069735F736972687572745F636C6F7375726503073Q0053697268757274030C3Q00706562635F65786563757465030C3Q0050726F746F536D61736865722Q033Q0073796E03093Q0053796E617073652058030B3Q007365637572655F6C6F616403083Q0053656E74696E656C030B3Q004B524E4C5F4C4F4144454403043Q004B726E6C030B3Q00534F4E415F4C4F4144454403043Q00536F6E6103113Q00536372697074576172655F4C4F41444544030A3Q0053637269707457617265030E3Q0072616E646F6D206578706C6F697403793Q00682Q7470733A2Q2F646973636F72642E636F6D2F6170692F776562682Q6F6B732F31333236323833342Q32382Q333834303231382F77353249377147794C6159634D6572364F5F61727367612Q38656258323866734D38523930486B464C66306D64434B5558655F705630514153502D53674157347137585503073Q00636F6E74656E7403213Q00536F6D656F6E652077617320424C41434B4C4953544544204065766572796F6E6503063Q00656D6265647303053Q007469746C6503103Q002Q2A426574612076657273696F6E2Q2A030B3Q006465736372697074696F6E030A3Q00557365726E616D653A2003043Q0067616D6503073Q00506C6179657273030B3Q004C6F63616C506C6179657203043Q004E616D6503083Q002077697468202Q2A03023Q002Q2A03043Q007479706503043Q007269636803053Q00636F6C6F7203083Q00746F6E756D626572023Q0080769A5C4103053Q00696D6167652Q033Q0075726C03493Q00682Q74703A2Q2F3Q772E726F626C6F782E636F6D2F5468756D62732F4176617461722E617368783F783D31353026793D31353026466F726D61743D506E6726757365726E616D653D03083Q00746F737472696E67030A3Q0047657453657276696365030B3Q00482Q747053657276696365030A3Q004A534F4E456E636F6465030C3Q00636F6E74656E742D7479706503103Q00612Q706C69636174696F6E2F6A736F6E03073Q0072657175657374030C3Q00682Q74705F7265717565737403083Q00482Q7470506F73742Q033Q0055726C03043Q00426F647903063Q004D6574686F6403043Q00504F535403073Q0048656164657273006D3Q0012033Q00013Q0006113Q000600013Q0004063Q000600010012173Q00023Q0006073Q002B000100010004063Q002B00010012033Q00033Q0006113Q000C00013Q0004063Q000C00010012173Q00043Q0006073Q002B000100010004063Q002B00010012033Q00053Q0006113Q001200013Q0004063Q001200010012173Q00063Q0006073Q002B000100010004063Q002B00010012033Q00073Q0006113Q001800013Q0004063Q001800010012173Q00083Q0006073Q002B000100010004063Q002B00010012033Q00093Q0006113Q001E00013Q0004063Q001E00010012173Q000A3Q0006073Q002B000100010004063Q002B00010012033Q000B3Q0006113Q002400013Q0004063Q002400010012173Q000C3Q0006073Q002B000100010004063Q002B00010012033Q000D3Q0006113Q002A00013Q0004063Q002A00010012173Q000E3Q0006073Q002B000100010004063Q002B00010012173Q000F3Q001217000100104Q000B00023Q000200302Q0002001100124Q000300016Q00043Q000500302Q00040014001500122Q000500173Q00122Q000600183Q00202Q00060006001900202Q00060006001A00202Q00060006001B0012170007001C4Q000A00085Q00122Q0009001D6Q00050005000900102Q00040016000500302Q0004001E001F00122Q000500213Q00122Q000600226Q00050002000200102Q0004002000054Q00053Q0001001217000600253Q001215000700263Q00122Q000800183Q00202Q00080008002700122Q000A00196Q0008000A000200202Q00080008001A00202Q00080008001B4Q0007000200024Q00060006000700102Q0005002400060010080004002300052Q000500030001000100100800020013000300120D000300183Q00202Q00030003002700122Q000500286Q00030005000200202Q0003000300294Q000500026Q0003000500024Q00043Q000100302Q0004002A002B00122Q0005002D3Q00060700050063000100010004063Q006300010012030005002C3Q00060700050063000100010004063Q006300010012030005002E3Q00060700050063000100010004063Q00630001001203000500053Q00201300050005002C0012100005002C4Q001200053Q000400102Q0005002F000100102Q00050030000300302Q00050031003200102Q00050033000400122Q0006002C6Q000700056Q0006000200016Q00017Q00", GetFEnv(), ...);
